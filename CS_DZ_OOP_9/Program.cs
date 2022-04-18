@@ -23,7 +23,7 @@ namespace CS_DZ_OOP_9
 
             while (clients.Count > 0)
             {
-                Console.WriteLine("Клиент номер - " + clientNumber);
+                Console.WriteLine("Клиент - " + clientNumber);
                 foreach (var client in clients)
                 {
                     client.Buy(products);
