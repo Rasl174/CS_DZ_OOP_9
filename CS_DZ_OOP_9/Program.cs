@@ -15,7 +15,7 @@ namespace CS_DZ_OOP_9
 
     class Store
     {
-        protected List<Product> _products = new List<Product>() { new Product("Макароны", 150), new Product("Газировка", 200), new Product("Масло", 300) };
+        private List<Product> _products = new List<Product>() { new Product("Макароны", 150), new Product("Газировка", 200), new Product("Масло", 300) };
 
         public void Work(List<Client> clients)
         {
@@ -63,13 +63,19 @@ namespace CS_DZ_OOP_9
         public void Buy(List<Product> products)
         {
             List<Product> buyingProducts = new List<Product>();
+            List<Product> cart = new List<Product>();
 
-            ChekAllCost(products, out int allCostProducts);
-            ShuffleProducts(products);
+            foreach (var product in products)
+            {
+                cart.Add(product);
+            }
+            int allCostProducts = 0;
+
+            SumProductCost(cart, ref allCostProducts);
 
             if(Money >= allCostProducts)
             {
-                foreach (var product in products)
+                foreach (var product in cart)
                 {
                     buyingProducts.Add(product);
                     Pay(product.Cost);
@@ -78,33 +84,39 @@ namespace CS_DZ_OOP_9
             }
             else
             {
-                foreach (var product in products)
+                ShuffleCartProducts(cart);
+                while (cart.Count > 0)
                 {
-                    if(product.Cost <= Money)
+                    foreach (var product in cart)
                     {
-                        buyingProducts.Add(product);
-                        Pay(product.Cost);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Мне не хватает на - " + product.Name);
+                        if(product.Cost <= Money)
+                        {
+                            buyingProducts.Add(product);
+                            Pay(product.Cost);
+                            cart.Remove(product);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Мне не хватает на - " + product.Name);
+                            cart.Remove(product);
+                        }
+                        break;
                     }
                 }
             }
             ShowBuyingProducts(buyingProducts);
         }
 
-        public void ChekAllCost(List<Product> products, out int allCostProducts)
+        public int SumProductCost(List<Product> cart, ref int allCostProducts)
         {
-            allCostProducts = 0;
-
-            foreach (var product in products)
+            foreach (var product in cart)
             {
                 allCostProducts += product.Cost;
             }
+            return allCostProducts;
         }
 
-        public void ShuffleProducts(List<Product> products)
+        public void ShuffleCartProducts(List<Product> products)
         {
             Random random = new Random();
 
