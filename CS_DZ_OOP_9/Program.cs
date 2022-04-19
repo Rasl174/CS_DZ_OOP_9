@@ -15,9 +15,10 @@ namespace CS_DZ_OOP_9
 
     class Store
     {
+        protected List<Product> _products = new List<Product>() { new Product("Макароны", 150), new Product("Газировка", 200), new Product("Масло", 300) };
+
         public void Work(List<Client> clients)
         {
-            List<Product> products = new List<Product>() { new Product("Макароны", 150), new Product("Газировка", 200), new Product("Масло", 300) };
 
             int clientNumber = 1;
 
@@ -26,7 +27,7 @@ namespace CS_DZ_OOP_9
                 Console.WriteLine("Клиент - " + clientNumber);
                 foreach (var client in clients)
                 {
-                    client.Buy(products);
+                    client.Buy(_products);
                     clients.Remove(client);
                     break;
                 }
@@ -62,33 +63,13 @@ namespace CS_DZ_OOP_9
         public void Buy(List<Product> products)
         {
             List<Product> buyingProducts = new List<Product>();
-            List<Product> productsCart = new List<Product>();
-            int allCostProducts = 0;
 
-            foreach (var product in products)
-            {
-                productsCart.Add(product);
-            }
-
-            Random random = new Random();
-
-            for (int i = productsCart.Count - 1; i >= 1; i--)
-            {
-                int inex = random.Next(i + 1);
-
-                Product productInCart = productsCart[inex];
-                productsCart[inex] = productsCart[i];
-                productsCart[i] = productInCart;
-            }
-
-            foreach (var product in productsCart)
-            {
-                allCostProducts += product.Cost;
-            }
+            ChekAllCost(products, out int allCostProducts);
+            ShuffleProducts(products);
 
             if(Money >= allCostProducts)
             {
-                foreach (var product in productsCart)
+                foreach (var product in products)
                 {
                     buyingProducts.Add(product);
                     Pay(product.Cost);
@@ -97,26 +78,44 @@ namespace CS_DZ_OOP_9
             }
             else
             {
-                while (productsCart.Count > 0)
+                foreach (var product in products)
                 {
-                    foreach (var product in productsCart)
+                    if(product.Cost <= Money)
                     {
-                        if(product.Cost <= Money)
-                        {
-                            buyingProducts.Add(product);
-                            Pay(product.Cost);
-                            productsCart.Remove(product);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Мне не хватает на - " + product.Name);
-                            productsCart.Remove(product);
-                        }
-                        break;
+                        buyingProducts.Add(product);
+                        Pay(product.Cost);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Мне не хватает на - " + product.Name);
                     }
                 }
             }
             ShowBuyingProducts(buyingProducts);
+        }
+
+        public void ChekAllCost(List<Product> products, out int allCostProducts)
+        {
+            allCostProducts = 0;
+
+            foreach (var product in products)
+            {
+                allCostProducts += product.Cost;
+            }
+        }
+
+        public void ShuffleProducts(List<Product> products)
+        {
+            Random random = new Random();
+
+            for (int i = products.Count - 1; i >= 1; i--)
+            {
+                int inex = random.Next(i + 1);
+
+                Product productInCart = products[inex];
+                products[inex] = products[i];
+                products[i] = productInCart;
+            }
         }
 
         public void ShowBuyingProducts(List<Product> products)
